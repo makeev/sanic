@@ -239,7 +239,8 @@ class HttpProtocol(HttpProtocolMixin, SanicProtocol, metaclass=TouchUpMeta):
             self._callback_check_timeouts.cancel()
             if self.transport:
                 self.transport.close()
-                self.abort()
+                timeout = self.app.config.GRACEFUL_SHUTDOWN_TIMEOUT
+                self.loop.call_later(timeout, self.abort)
 
     async def send(self, data):  # no cov
         """
